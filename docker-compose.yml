@@ -1,0 +1,43 @@
+version: "3.7"
+
+services:
+    nginx-proxy:
+        image: jwilder/nginx-proxy
+        logging:
+            options:
+                max-size: "10m"
+                max-file: "3"
+        container_name: nginx-proxy
+        restart: unless-stopped
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
+            - ./nginx/certs:/etc/nginx/certs:ro
+            - ./nginx/vhost.d:/etc/nginx/vhost.d
+            - ./nginx/html:/usr/share/nginx/html
+        environment:
+            - ENABLE_IPV6=true
+        networks:
+            - plinskiy_ru
+
+    letsencrypt:
+        image: jrcs/letsencrypt-nginx-proxy-companion
+        container_name: letsencrypt
+        restart: unless-stopped
+        depends_on:
+            - nginx-proxy
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - ./nginx/certs:/etc/nginx/certs:rw
+            - ./nginx/vhost.d:/etc/nginx/vhost.d
+            - ./nginx/html:/usr/share/nginx/html
+        environment:
+            - NGINX_PROXY_CONTAINER=nginx-proxy
+        networks:
+            - plinskiy_ru
+
+networks:
+    plinskiy_ru:
+        external: true
