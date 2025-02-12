@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
     nginx-proxy:
-        image: jwilder/nginx-proxy
+        image: nginxproxy/nginx-proxy:latest
         logging:
             options:
                 max-size: "10m"
@@ -23,7 +23,7 @@ services:
             - plinskiy_ru
 
     letsencrypt:
-        image: jrcs/letsencrypt-nginx-proxy-companion
+        image: nginxproxy/acme-companion:latest
         container_name: letsencrypt
         restart: unless-stopped
         depends_on:
